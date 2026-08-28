@@ -1,20 +1,8 @@
-# Quick Links
+# Quick Links - Liquid Glass v5
 
-SharePoint の `quick-links-data.js` を読み込み、Lucide アイコン付きの2列リンク集を表示します。
+Clear-glass edition.
 
-## Display modes
-
-`index.html` の `<body>` クラスで表示モードを切り替えられます。
-
-- `mode-glass`: Liquid Glass風（既定）
-- `mode-card`: 通常カード
-
-例:
-
-```html
-<body class="mode-glass">
-```
-
-```html
-<body class="mode-card">
-```
+- Liquid Glass mode: `<body class="mode-glass">`
+- Card mode: `<body class="mode-card">`
+- SharePoint quick-links data loading remains unchanged.
+- v5 lowers the milky white fill and relies on transparent tint, optical rim, moving reflection and blue-green edge refraction.
