@@ -1,0 +1,309 @@
+/* ===========================
+   Glass Engine v2
+   White Background Edition
+=========================== */
+
+.glass{
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.88),
+            rgba(244,251,253,.72)
+        );
+
+    border:1px solid rgba(93,154,177,.22);
+
+    box-shadow:
+        0 8px 20px rgba(32,73,92,.10),
+        inset 0 1px 0 rgba(255,255,255,.96),
+        inset 0 -1px 0 rgba(87,159,184,.10);
+
+    transform:
+
+        perspective(700px)
+
+        rotateX(var(--glass-tilt-x,0deg))
+
+        rotateY(var(--glass-tilt-y,0deg));
+
+    transition:
+
+        transform .25s ease,
+
+        background .25s ease,
+
+        border-color .25s ease,
+
+        box-shadow .25s ease;
+}
+
+.glass:hover{
+    transform:
+
+        perspective(700px)
+
+        translateY(-2px)
+
+        rotateX(var(--glass-tilt-x,0deg))
+
+        rotateY(var(--glass-tilt-y,0deg));
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.96),
+            rgba(235,249,253,.84)
+        );
+
+    border-color:rgba(22,154,197,.34);
+
+    box-shadow:
+        0 14px 28px rgba(32,73,92,.15),
+        0 0 0 1px rgba(42,190,223,.07),
+        inset 0 1px 0 rgba(255,255,255,1),
+        inset 0 -1px 0 rgba(42,167,202,.14);
+}
+
+/* 淡い液体反射 */
+.glass-layer{
+    position:absolute;
+    inset:-18%;
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle at 15% 18%,
+            rgba(255,255,255,.72),
+            transparent 24%
+        ),
+        radial-gradient(
+            circle at 84% 82%,
+            rgba(44,181,216,.11),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 32% 96%,
+            rgba(52,201,167,.06),
+            transparent 30%
+        );
+
+    filter:blur(12px);
+    opacity:.55;
+
+    animation:liquidFloat 10s ease-in-out infinite alternate;
+}
+
+/* 流れる光沢 */
+.glass-highlight{
+    position:absolute;
+    inset:-60%;
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent 0%,
+            rgba(255,255,255,0) 36%,
+            rgba(255,255,255,.64) 49%,
+            rgba(255,255,255,0) 62%,
+            transparent 100%
+        );
+
+    transform:rotate(10deg);
+    opacity:0;
+
+    animation:glassShine 6.5s ease-in-out infinite;
+}
+
+/* 微細ノイズ */
+.glass-noise{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+
+    opacity:.028;
+
+    background-image:
+        radial-gradient(
+            circle,
+            rgba(58,116,138,.42) .65px,
+            transparent .8px
+        );
+
+    background-size:13px 13px;
+    mix-blend-mode:multiply;
+}
+
+/* 反射レイヤー */
+.glass-reflection{
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    z-index:4;
+
+    background:
+        radial-gradient(
+            circle at var(--glass-x, 50%) var(--glass-y, 50%),
+            rgba(255,255,255,.90) 0%,
+            rgba(255,255,255,.42) 10%,
+            rgba(119,221,242,.16) 24%,
+            transparent 48%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.30),
+            transparent 38%,
+            rgba(32,171,205,.08)
+        );
+
+    opacity:.46;
+    mix-blend-mode:screen;
+
+    transition:opacity .25s ease;
+}
+
+.glass:hover .glass-reflection{
+    opacity:.72;
+}
+
+.glass:hover .glass-reflection{
+    opacity:.52;
+}
+
+/* 本文 */
+.glass-content{
+    position:relative;
+    z-index:10;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+/* 文字 */
+.glass .left span{
+    color:#243746;
+    text-shadow:none;
+    font-weight:650;
+}
+
+/* アイコン */
+.glass .left svg{
+    color:#168eb6;
+
+    filter:
+        drop-shadow(0 2px 4px rgba(32,110,140,.16));
+
+    transition:
+        transform .24s ease,
+        color .24s ease,
+        filter .24s ease;
+}
+
+.glass:hover .left svg{
+    transform:scale(1.08);
+    color:#00a7cf;
+
+    filter:
+        drop-shadow(0 0 7px rgba(0,171,209,.26));
+}
+
+/* 矢印 */
+.glass .arrow{
+    color:#5d8798;
+    opacity:.5;
+}
+
+.glass:hover .arrow{
+    color:#168eb6;
+    opacity:1;
+}
+
+/* 押した時 */
+.glass:active{
+    transform:translateY(0) scale(.985);
+}
+
+/* ===========================
+   Animations
+=========================== */
+
+@keyframes liquidFloat{
+    0%{
+        transform:
+            translate3d(-1.5%, -1%, 0)
+            scale(1.02);
+    }
+
+    100%{
+        transform:
+            translate3d(1.5%, 1%, 0)
+            scale(1.05);
+    }
+}
+
+@keyframes glassShine{
+    0%{
+        transform:
+            translateX(-120%)
+            rotate(10deg);
+        opacity:0;
+    }
+
+    58%{
+        opacity:0;
+    }
+
+    68%{
+        opacity:.28;
+    }
+
+    84%{
+        transform:
+            translateX(120%)
+            rotate(10deg);
+        opacity:.08;
+    }
+
+    100%{
+        transform:
+            translateX(120%)
+            rotate(10deg);
+        opacity:0;
+    }
+}
+
+@keyframes reflectionBreathe{
+    0%{
+        transform:translate3d(-.7%, -.7%, 0) scale(1);
+        filter:blur(0);
+    }
+
+    100%{
+        transform:translate3d(.7%, .7%, 0) scale(1.025);
+        filter:blur(.7px);
+    }
+}
+
+/* 動きを減らす設定への配慮 */
+@media (prefers-reduced-motion: reduce){
+    .glass,
+    .glass-layer,
+    .glass-highlight,
+    .glass-reflection,
+    .glass .left svg,
+    .glass .arrow{
+        animation:none !important;
+        transition:none !important;
+    }
+}

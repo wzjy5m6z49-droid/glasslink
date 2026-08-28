@@ -1,0 +1,133 @@
+html,
+body{
+    margin:0;
+    padding:0;
+    background:transparent;
+    font-family:"Segoe UI",sans-serif;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+.links{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(0,1fr));
+
+    gap:12px;
+
+    width:100%;
+
+    padding:2px;
+
+}
+
+.link{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    min-height:56px;
+
+    padding:14px 16px;
+
+    border-radius:20px;
+
+    text-decoration:none;
+
+    color:white;
+
+}
+
+.glass-content{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    width:100%;
+
+}
+
+.left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-width:0;
+
+}
+
+.left span{
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.left svg{
+
+    width:26px;
+
+    height:26px;
+
+    flex-shrink:0;
+
+}
+
+.arrow{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    opacity:.55;
+
+    transition:.25s;
+
+}
+
+.arrow svg{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+.link:hover .arrow{
+
+    transform:translateX(4px);
+
+    opacity:1;
+
+}
+
+@media(max-width:420px){
+
+    .links{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
