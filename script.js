@@ -1,59 +1,58 @@
-const script = document.createElement("script");
+const dataScript = document.createElement("script");
 
-script.src =
-"https://digitalgojp.sharepoint.com/sites/NTA_IBHub12/SiteAssets/quick-links/quick-links-data.js?v=" +
-Date.now();
+dataScript.src =
+  "https://digitalgojp.sharepoint.com/sites/NTA_IBHub12/SiteAssets/quick-links/quick-links-data.js?v=" +
+  Date.now();
 
-script.onload = () => {
+dataScript.onload = () => {
+  const app = document.getElementById("links");
 
-    const app = document.getElementById("links");
+  const data = [...(window.quickLinksData || [])]
+    .sort((a,b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
 
-    const data =
-        [...(window.quickLinksData || [])]
-        .sort((a,b)=>a.sortOrder-b.sortOrder);
+  app.replaceChildren();
 
-    app.innerHTML = "";
+  data.forEach(item => {
+    const el = document.createElement("a");
 
-    data.forEach(item=>{
+    el.className = "link glass";
+    el.href = item.link || "#";
+    el.target = "_blank";
+    el.rel = "noopener noreferrer";
 
-        const el = document.createElement("a");
+    el.innerHTML = `
+      <div class="glass-layer"></div>
+      <div class="glass-highlight"></div>
+      <div class="glass-noise"></div>
+      <div class="glass-reflection"></div>
 
-        el.className = "link glass";
-        el.href = item.link;
-        el.target = "_blank";
+      <div class="glass-content">
+        <div class="left">
+          <i data-lucide="${item.icon || "link"}"></i>
+          <span></span>
+        </div>
 
-        el.innerHTML = `
-            <div class="glass-layer"></div>
-            <div class="glass-highlight"></div>
-            <div class="glass-noise"></div>
-            <div class="glass-reflection"></div>
+        <div class="arrow" aria-hidden="true">
+          <i data-lucide="chevron-right"></i>
+        </div>
+      </div>
+    `;
 
-            <div class="glass-content">
-                <div class="left">
-                    <i data-lucide="${item.icon}"></i>
-                    <span>${item.title}</span>
-                </div>
+    el.querySelector(".left span").textContent = item.title || "";
+    app.appendChild(el);
+  });
 
-                <div class="arrow">
-                    <i data-lucide="chevron-right"></i>
-                </div>
-            </div>
-        `;
-
-        app.appendChild(el);
-
-    });
-
+  if(window.lucide){
     lucide.createIcons();
+  }
 
-    if (typeof initGlass === "function") {
-        initGlass();
-    }
-
+  if(typeof window.initGlass === "function"){
+    window.initGlass(app);
+  }
 };
 
-script.onerror = () => {
-    console.error("quick-links-data.js の読み込みに失敗しました");
+dataScript.onerror = () => {
+  console.error("quick-links-data.js の読み込みに失敗しました");
 };
 
-document.head.appendChild(script);
+document.head.appendChild(dataScript);

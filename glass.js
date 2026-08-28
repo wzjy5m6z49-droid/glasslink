@@ -1,109 +1,144 @@
-// ========================================
-// Glass Engine v2
-// Mouse reflection + lightweight animation
-// ========================================
+/* =========================================================
+   Liquid Glass Engine v4
+   - pointer-following optical highlight
+   - subtle 3D tilt
+   - independent slow liquid drift per card
+   - one RAF loop for every card
+========================================================= */
 
-const glassCards = new Map();
+(() => {
+  const states = new Map();
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let rafId = 0;
+  let running = false;
 
-function initGlass() {
-    document.querySelectorAll(".glass").forEach((card, index) => {
+  const clamp = (value,min,max) => Math.max(min,Math.min(max,value));
 
-        // 再初期化時のイベント重複を防ぐ
-        if (card.dataset.glassInitialized === "true") {
-            return;
-        }
+  function attach(card){
+    if(card.dataset.glassInitialized === "true") return;
+    card.dataset.glassInitialized = "true";
 
-        card.dataset.glassInitialized = "true";
+    const state = {
+      card,
+      currentX:50,
+      currentY:50,
+      targetX:50,
+      targetY:50,
+      hover:0,
+      hoverTarget:0,
+      phase:Math.random() * Math.PI * 2,
+      speed:.00019 + Math.random() * .00009
+    };
 
-        const state = {
-            currentX: 50,
-            currentY: 50,
-            targetX: 50,
-            targetY: 50,
-            phase: Math.random() * Math.PI * 2,
-            speed: 0.00025 + Math.random() * 0.00015
-        };
+    states.set(card,state);
 
-        glassCards.set(card, state);
+    card.style.setProperty("--gx","50%");
+    card.style.setProperty("--gy","50%");
+    card.style.setProperty("--tilt-x","0deg");
+    card.style.setProperty("--tilt-y","0deg");
+    card.style.setProperty("--liquid-x","0px");
+    card.style.setProperty("--liquid-y","0px");
 
-        // 初期値
-        card.style.setProperty("--glass-x", "50%");
-        card.style.setProperty("--glass-y", "50%");
-        card.style.setProperty("--glass-tilt-x", "0deg");
-        card.style.setProperty("--glass-tilt-y", "0deg");
+    card.addEventListener("pointerenter",() => {
+      state.hoverTarget = 1;
+    },{passive:true});
 
-        card.addEventListener("pointermove", event => {
-            const rect = card.getBoundingClientRect();
+    card.addEventListener("pointermove",event => {
+      const rect = card.getBoundingClientRect();
+      if(!rect.width || !rect.height) return;
 
-            const x =
-                ((event.clientX - rect.left) / rect.width) * 100;
+      const x = clamp(((event.clientX - rect.left) / rect.width) * 100,0,100);
+      const y = clamp(((event.clientY - rect.top) / rect.height) * 100,0,100);
 
-            const y =
-                ((event.clientY - rect.top) / rect.height) * 100;
+      state.targetX = x;
+      state.targetY = y;
 
-            state.targetX = Math.max(0, Math.min(100, x));
-            state.targetY = Math.max(0, Math.min(100, y));
+      /* Deliberately tiny: enough to make the surface feel curved,
+         not enough to make text wobble. */
+      const tiltY = ((x - 50) / 50) * 1.15;
+      const tiltX = -((y - 50) / 50) * .85;
 
-            const tiltY = ((x - 50) / 50) * 1.5;
-            const tiltX = -((y - 50) / 50) * 1.5;
+      card.style.setProperty("--tilt-x",`${tiltX.toFixed(2)}deg`);
+      card.style.setProperty("--tilt-y",`${tiltY.toFixed(2)}deg`);
+    },{passive:true});
 
-            card.style.setProperty(
-                "--glass-tilt-x",
-                `${tiltX.toFixed(2)}deg`
-            );
+    card.addEventListener("pointerleave",() => {
+      state.hoverTarget = 0;
+      state.targetX = 50;
+      state.targetY = 50;
+      card.style.setProperty("--tilt-x","0deg");
+      card.style.setProperty("--tilt-y","0deg");
+    },{passive:true});
+  }
 
-            card.style.setProperty(
-                "--glass-tilt-y",
-                `${tiltY.toFixed(2)}deg`
-            );
-        });
+  function initGlass(root=document){
+    root.querySelectorAll(".glass").forEach(attach);
+    startLoop();
+  }
 
-        card.addEventListener("pointerleave", () => {
-            state.targetX = 50;
-            state.targetY = 50;
+  function frame(time){
+    if(!running) return;
 
-            card.style.setProperty("--glass-tilt-x", "0deg");
-            card.style.setProperty("--glass-tilt-y", "0deg");
-        });
+    states.forEach(state => {
+      state.hover += (state.hoverTarget - state.hover) * .08;
+
+      const follow = .065 + state.hover * .075;
+      state.currentX += (state.targetX - state.currentX) * follow;
+      state.currentY += (state.targetY - state.currentY) * follow;
+
+      const ambientX = Math.sin(time * state.speed + state.phase) * 1.15;
+      const ambientY = Math.cos(time * state.speed * .76 + state.phase) * .85;
+
+      state.card.style.setProperty(
+        "--gx",
+        `${(state.currentX + ambientX).toFixed(2)}%`
+      );
+      state.card.style.setProperty(
+        "--gy",
+        `${(state.currentY + ambientY).toFixed(2)}%`
+      );
+
+      /* Internal liquid moves more than the card itself. */
+      const driftScale = 1 + state.hover * .45;
+      const lx = Math.sin(time * state.speed * .70 + state.phase) * 5.2 * driftScale;
+      const ly = Math.cos(time * state.speed * .54 + state.phase) * 3.4 * driftScale;
+
+      state.card.style.setProperty("--liquid-x",`${lx.toFixed(2)}px`);
+      state.card.style.setProperty("--liquid-y",`${ly.toFixed(2)}px`);
     });
-}
 
-function animateGlass(time) {
-    glassCards.forEach((state, card) => {
+    rafId = requestAnimationFrame(frame);
+  }
 
-        // マウス位置へ滑らかに追従
-        state.currentX +=
-            (state.targetX - state.currentX) * 0.075;
+  function startLoop(){
+    if(running || reduceMotion.matches || document.hidden) return;
+    running = true;
+    rafId = requestAnimationFrame(frame);
+  }
 
-        state.currentY +=
-            (state.targetY - state.currentY) * 0.075;
+  function stopLoop(){
+    running = false;
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
 
-        // ごく弱い自然な揺らぎ
-        const driftX =
-            Math.sin(time * state.speed + state.phase) * 1.2;
+  document.addEventListener("visibilitychange",() => {
+    if(document.hidden) stopLoop();
+    else startLoop();
+  });
 
-        const driftY =
-            Math.cos(time * state.speed * 0.8 + state.phase) * 0.8;
-
-        card.style.setProperty(
-            "--glass-x",
-            `${(state.currentX + driftX).toFixed(2)}%`
-        );
-
-        card.style.setProperty(
-            "--glass-y",
-            `${(state.currentY + driftY).toFixed(2)}%`
-        );
+  if(typeof reduceMotion.addEventListener === "function"){
+    reduceMotion.addEventListener("change",event => {
+      if(event.matches) stopLoop();
+      else startLoop();
     });
+  }
 
-    requestAnimationFrame(animateGlass);
-}
+  window.initGlass = initGlass;
 
-// script.jsでカード生成後に呼び出せるよう公開
-window.initGlass = initGlass;
-
-// 念のため通常読込時にも初期化
-window.addEventListener("load", () => {
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded",() => initGlass());
+  }else{
     initGlass();
-    requestAnimationFrame(animateGlass);
-});
+  }
+})();

@@ -1,34 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick Links</title>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css?v=glass4">
+  <link rel="stylesheet" href="glass.css?v=glass4">
 
-    <title>Quick Links</title>
-
-    <!-- レイアウト -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Glass Engine -->
-    <link rel="stylesheet" href="glass.css">
-
-    <!-- Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+<body class="mode-glass">
 
-<body>
+  <!-- Liquid Glassの内部屈折用。文字やアイコンには掛けない。 -->
+  <svg class="glass-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="liquid-distortion" x="-20%" y="-30%" width="140%" height="160%">
+        <feTurbulence
+          id="glass-turbulence"
+          type="fractalNoise"
+          baseFrequency="0.010 0.018"
+          numOctaves="2"
+          seed="7"
+          result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="0.35" result="softNoise" />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="softNoise"
+          scale="7"
+          xChannelSelector="R"
+          yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
 
-    <div id="links" class="links"></div>
+  <main class="quick-links-shell">
+    <div id="links" class="links" aria-label="Quick Links"></div>
+  </main>
 
-    <!-- データ読込 -->
-    <script src="script.js"></script>
-
-    <!-- Glass Engine -->
-    <script src="glass.js"></script>
-
+  <script src="glass.js?v=glass4"></script>
+  <script src="script.js?v=glass4"></script>
 </body>
-
 </html>
