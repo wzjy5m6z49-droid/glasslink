@@ -79,7 +79,12 @@
   function frame(time){
     if(!running) return;
 
-    states.forEach(state => {
+    states.forEach((state,card) => {
+      if(!card.isConnected){
+        states.delete(card);
+        return;
+      }
+
       state.hover += (state.hoverTarget - state.hover) * .08;
 
       const follow = .065 + state.hover * .075;

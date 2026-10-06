@@ -3,42 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quick Links</title>
+  <title>Category Links</title>
 
-  <link rel="stylesheet" href="style.css?v=glass5">
-  <link rel="stylesheet" href="glass.css?v=glass5">
-
+  <link rel="stylesheet" href="style.css?v=category-glass1">
+  <link rel="stylesheet" href="glass.css?v=category-glass1">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="mode-glass">
 
-  <!-- Liquid Glassの内部屈折用。文字やアイコンには掛けない。 -->
+  <!-- Liquid Glass の内部屈折用。文字・アイコンには掛けない。 -->
   <svg class="glass-defs" aria-hidden="true" focusable="false">
     <defs>
       <filter id="liquid-distortion" x="-20%" y="-30%" width="140%" height="160%">
-        <feTurbulence
-          id="glass-turbulence"
-          type="fractalNoise"
-          baseFrequency="0.010 0.018"
-          numOctaves="2"
-          seed="7"
-          result="noise" />
+        <feTurbulence id="glass-turbulence" type="fractalNoise"
+          baseFrequency="0.010 0.018" numOctaves="2" seed="7" result="noise" />
         <feGaussianBlur in="noise" stdDeviation="0.35" result="softNoise" />
-        <feDisplacementMap
-          in="SourceGraphic"
-          in2="softNoise"
-          scale="5.5"
-          xChannelSelector="R"
-          yChannelSelector="G" />
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="5.5"
+          xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
 
   <main class="quick-links-shell">
-    <div id="links" class="links" aria-label="Quick Links"></div>
+    <nav id="categoryNav" class="category-nav" aria-label="カテゴリー">
+      <div class="category-indicator" aria-hidden="true">
+        <div class="indicator-liquid"></div>
+        <div class="indicator-shine"></div>
+      </div>
+      <div id="categoryButtons" class="category-buttons"></div>
+    </nav>
+
+    <div id="links" class="links" aria-live="polite"></div>
   </main>
 
-  <script src="glass.js?v=glass5"></script>
-  <script src="script.js?v=glass5"></script>
+  <script src="glass.js?v=category-glass1"></script>
+  <script src="script.js?v=category-glass1"></script>
 </body>
 </html>
